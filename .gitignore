@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.venv/
+src/moledao_spider.egg-info/
+output*/
+*.docx
+.DS_Store
