@@ -5,3 +5,5 @@ src/moledao_spider.egg-info/
 output*/
 *.docx
 .DS_Store
+
+electron-vite-project/release
