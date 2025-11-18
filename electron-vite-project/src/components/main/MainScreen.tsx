@@ -121,7 +121,7 @@ export const MainScreen = ({
                 </span>
                 <span className="text-[0.65rem] font-semibold uppercase tracking-[0.5em] text-muted-foreground">{t('aiWageRateLabel')}</span>
               </div>
-              <p className="mt-1 text-base dark:text-white/90 text-black/60">{t('aiWageWordsLabel', { count: formattedWordCount })}</p>
+              <p className="mt-1 text-base dark:text-white/90 text-black/60">{t('aiWageWordsLabel', { formattedCount: formattedWordCount })}</p>
               <p className="mt-2 text-xs text-muted-foreground">{t('aiWageHint')}</p>
             </div>
           </div>
