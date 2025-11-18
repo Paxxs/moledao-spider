@@ -41,6 +41,8 @@ function createWindow() {
     webPreferences: {
       preload: path.join(__dirname, 'preload.mjs'),
     },
+    titleBarStyle: 'hiddenInset',
+    ...(process.platform !== 'darwin' ? { titleBarOverlay: true } : {})
   })
 
   win.removeMenu?.()
