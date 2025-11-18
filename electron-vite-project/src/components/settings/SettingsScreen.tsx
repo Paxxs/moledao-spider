@@ -1,6 +1,6 @@
 import { useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
-import { DndContext, PointerSensor, closestCenter, useSensor, useSensors } from '@dnd-kit/core'
+import { DndContext, PointerSensor, closestCenter, useSensor, useSensors, type DragEndEvent } from '@dnd-kit/core'
 import { SortableContext, arrayMove, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { FolderOpen, GripVertical, Languages, Rows2 } from 'lucide-react'
@@ -96,7 +96,7 @@ export const SettingsScreen = () => {
     applyChange((prev) => ({ ...prev, jobsPerDoc: nextValue }))
   }
 
-  const handleDragEnd = (event: any) => {
+  const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event
     if (!over || active.id === over.id) return
     const oldIndex = settings.fieldOrder.indexOf(active.id as FieldKey)

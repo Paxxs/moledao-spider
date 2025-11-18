@@ -1,24 +1,26 @@
-import { ipcRenderer, contextBridge } from 'electron'
+import { contextBridge, ipcRenderer, type IpcRendererEvent } from 'electron'
 
-// --------- Expose some API to the Renderer process ---------
-contextBridge.exposeInMainWorld('ipcRenderer', {
-  on(...args: Parameters<typeof ipcRenderer.on>) {
-    const [channel, listener] = args
-    return ipcRenderer.on(channel, (event, ...args) => listener(event, ...args))
-  },
-  off(...args: Parameters<typeof ipcRenderer.off>) {
-    const [channel, ...omit] = args
-    return ipcRenderer.off(channel, ...omit)
-  },
-  send(...args: Parameters<typeof ipcRenderer.send>) {
-    const [channel, ...omit] = args
-    return ipcRenderer.send(channel, ...omit)
-  },
-  invoke(...args: Parameters<typeof ipcRenderer.invoke>) {
-    const [channel, ...omit] = args
-    return ipcRenderer.invoke(channel, ...omit)
-  },
+import type { AppMetadata, JobTickerItem, LogEntry, ProgressPayload, RunSummary, ScrapeStatus } from '@/types/ipc'
+import type { AppSettings } from '@/types/settings'
 
-  // You can expose other APTs you need here.
-  // ...
+const subscribe = <T>(channel: string) => (callback: (payload: T) => void) => {
+  const handler = (_event: IpcRendererEvent, payload: T) => callback(payload)
+  ipcRenderer.on(channel, handler)
+  return () => ipcRenderer.removeListener(channel, handler)
+}
+
+contextBridge.exposeInMainWorld('electronAPI', {
+  startScrape: () => ipcRenderer.invoke('scrape:start'),
+  cancelScrape: () => ipcRenderer.invoke('scrape:cancel'),
+  selectDirectory: () => ipcRenderer.invoke('settings:select-directory') as Promise<string | null>,
+  getSettings: () => ipcRenderer.invoke('settings:get') as Promise<AppSettings>,
+  saveSettings: (settings: AppSettings) => ipcRenderer.invoke('settings:save', settings) as Promise<AppSettings>,
+  getAppMeta: () => ipcRenderer.invoke('app:meta') as Promise<AppMetadata>,
+  openExternalLink: (url: string) => ipcRenderer.invoke('app:open-external', url),
+  openSummaryFolderAndExit: () => ipcRenderer.invoke('app:open-summary-and-exit'),
+  onLog: subscribe<LogEntry>('scrape:log'),
+  onStatus: subscribe<ScrapeStatus>('scrape:status'),
+  onJobBatch: subscribe<JobTickerItem[]>('scrape:job-batch'),
+  onProgress: subscribe<ProgressPayload>('scrape:progress'),
+  onSummary: subscribe<RunSummary>('scrape:summary'),
 })
