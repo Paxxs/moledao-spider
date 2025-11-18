@@ -24,6 +24,8 @@ export interface FieldPreferencePayload {
 export interface ProgressPayload {
   processed: number
   total: number
+  wordCount: number
+  aiCostUsd: number
 }
 
 export interface RunSummary {

@@ -1,3 +1,4 @@
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ArrowRight, Info, Settings, Terminal } from 'lucide-react'
 
@@ -44,6 +45,34 @@ export const MainScreen = ({
   const isRunning = status === 'running'
   const isCompleted = status === 'completed'
   const canStart = isHydrated && status !== 'running'
+  const totalWordCount = progress?.wordCount ?? 0
+  const aiCostUsd = progress?.aiCostUsd ?? 0
+  const formattedWordCount = useMemo(() => totalWordCount.toLocaleString(), [totalWordCount])
+  const formattedAiCost = useMemo(() => new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 4 }).format(aiCostUsd), [aiCostUsd])
+  const [wagePulse, setWagePulse] = useState(false)
+  const lastCostRef = useRef(aiCostUsd)
+  const pulseTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => {
+    const previous = lastCostRef.current
+    if (aiCostUsd > previous) {
+      setWagePulse(true)
+      if (pulseTimeoutRef.current) {
+        clearTimeout(pulseTimeoutRef.current)
+      }
+      pulseTimeoutRef.current = setTimeout(() => {
+        setWagePulse(false)
+        pulseTimeoutRef.current = null
+      }, 650)
+    }
+    lastCostRef.current = aiCostUsd
+    return () => {
+      if (pulseTimeoutRef.current) {
+        clearTimeout(pulseTimeoutRef.current)
+        pulseTimeoutRef.current = null
+      }
+    }
+  }, [aiCostUsd])
 
   return (
     <div className="flex h-full flex-col gap-6">
@@ -82,6 +111,18 @@ export const MainScreen = ({
                   <span className="text-base font-normal text-muted-foreground">{t('idleStatus')}</span>
                 )}
               </p>
+            </div>
+
+            <div className="rounded-2xl bg-gradient-to-br from-purple-500/20 via-sky-500/20 to-emerald-500/20 p-4">
+              <p className="text-xs uppercase tracking-[0.4em] text-muted-foreground">{t('aiWageTitle')}</p>
+              <div className="mt-2 flex items-baseline justify-between gap-3">
+                <span className={`inline-flex items-center text-2xl font-semibold dark:text-emerald-200 text-blue-500 ${wagePulse ? 'wage-pulse' : ''}`}>
+                  {formattedAiCost}
+                </span>
+                <span className="text-[0.65rem] font-semibold uppercase tracking-[0.5em] text-muted-foreground">{t('aiWageRateLabel')}</span>
+              </div>
+              <p className="mt-1 text-base dark:text-white/90 text-black/60">{t('aiWageWordsLabel', { count: formattedWordCount })}</p>
+              <p className="mt-2 text-xs text-muted-foreground">{t('aiWageHint')}</p>
             </div>
           </div>
 

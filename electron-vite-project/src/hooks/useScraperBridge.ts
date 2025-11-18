@@ -13,6 +13,9 @@ const MAX_LOG_LINES = 200
 const SIMULATION_JOB_DELAY_MS = 2200
 const SIMULATION_BATCH_PAUSE_MS = 2800
 const JOB_DISPLAY_WINDOW = 3600
+const SIM_WORDS_PER_JOB = 420
+const GPT4_MAX_MODEL_PRICE_PER_1K_TOKENS = 0.06
+const WORDS_PER_TOKEN_ESTIMATE = 0.75
 
 const sampleJobs: JobTickerItem[] = [
   { id: '1', company: 'GREENWICH OASIS CAPITAL', title: 'Fund Operations Specialist', preference: 'Office Only' },
@@ -83,7 +86,7 @@ export const useScraperBridge = () => {
     cancelTimers()
     setStatus('running')
     setLogs([])
-    setProgress({ processed: 0, total: sampleJobs.length })
+    setProgress({ processed: 0, total: sampleJobs.length, wordCount: 0, aiCostUsd: 0 })
     setSummary(null)
 
     sampleJobs.forEach((job, index) => {
@@ -95,7 +98,12 @@ export const useScraperBridge = () => {
         ])
         setTickerJobs([job])
         setJobCycle((cycle) => cycle + 1)
-        setProgress({ processed: index + 1, total: sampleJobs.length })
+        const processed = index + 1
+        const wordCount = processed * SIM_WORDS_PER_JOB
+        const approximateTokens = wordCount / WORDS_PER_TOKEN_ESTIMATE
+        const cost = (approximateTokens / 1000) * GPT4_MAX_MODEL_PRICE_PER_1K_TOKENS
+        const aiCostUsd = Math.round(cost * 10000) / 10000
+        setProgress({ processed, total: sampleJobs.length, wordCount, aiCostUsd })
         if (index === sampleJobs.length - 1) {
           const doneTimer = setTimeout(() => {
             setSummary({ outputDirectory: '/tmp/mock-output', files: ['jobs-001.docx'] })

@@ -62,6 +62,8 @@ const TICKER_BATCH_SIZE = 3
 const SCRAPE_THROTTLE_DELAY_MS = 1500
 const ANIMATION_BATCH_DELAY_MS = 2800
 const POST_ANIMATION_IDLE_DELAY_MS = 500
+const GPT4_MAX_MODEL_PRICE_PER_1K_TOKENS = 0.06
+const WORDS_PER_TOKEN_ESTIMATE = 0.75
 
 const sanitizeOptions: IOptions = {
   allowedTags: ['p', 'br', 'ul', 'ol', 'li', 'strong', 'em', 'b', 'i'],
@@ -226,6 +228,7 @@ export class ScraperService {
       }
       const normalizedJobs: NormalizedJob[] = []
       const tickerBuffer: JobTickerItem[] = []
+      let totalWordCount = 0
 
       for (let index = 0; index < listEntries.length; index += 1) {
         if (this.cancelRequested) break
@@ -236,9 +239,12 @@ export class ScraperService {
           (entry as DetailEntry)
         const normalized = this.normalizeJob(entry, detail)
         normalizedJobs.push(normalized)
+        const jobWordCount = this.estimateWordCount(entry, detail)
+        totalWordCount += jobWordCount
+        const aiCostUsd = this.calculateAiCostUsd(totalWordCount)
 
         this.emitLog({ message: `[${normalized.company}][${normalized.role}]-[${normalized.preferenceText}]`, level: 'info' })
-        this.emitProgress({ processed: index + 1, total: listEntries.length })
+        this.emitProgress({ processed: index + 1, total: listEntries.length, wordCount: totalWordCount, aiCostUsd })
 
         tickerBuffer.push({ id: normalized.id, company: normalized.company, title: normalized.role, preference: normalized.preferenceText })
         if (tickerBuffer.length >= TICKER_BATCH_SIZE || index === listEntries.length - 1) {
@@ -355,6 +361,21 @@ export class ScraperService {
       relativeTime: formatRelativeTime(detailEntry.updateDate ?? listEntry.updateDate),
       updateDate: detailEntry.updateDate ?? listEntry.updateDate,
     }
+  }
+
+  private estimateWordCount(listEntry: ListEntry, detailEntry: DetailEntry): number {
+    const payload = JSON.stringify({ listEntry, detailEntry })
+    if (!payload) return 0
+    const normalized = payload.replace(/[^0-9A-Za-z\u00C0-\uFFFF]+/g, ' ').trim()
+    if (!normalized) return 0
+    return normalized.split(/\s+/).length
+  }
+
+  private calculateAiCostUsd(wordCount: number): number {
+    if (wordCount <= 0) return 0
+    const approximateTokens = wordCount / WORDS_PER_TOKEN_ESTIMATE
+    const cost = (approximateTokens / 1000) * GPT4_MAX_MODEL_PRICE_PER_1K_TOKENS
+    return Math.round(cost * 10000) / 10000
   }
 
   private async fetchLiveList(): Promise<ListEntry[]> {
