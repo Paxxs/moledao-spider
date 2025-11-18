@@ -32,52 +32,58 @@ function App() {
 
   return (
     <TooltipProvider>
-      <div className="min-h-screen bg-gradient-to-br from-background via-background to-background/70 text-foreground">
-        <div className="mx-auto flex max-w-6xl flex-col gap-6 px-6 py-10">
-          <header className="space-y-2 text-center md:text-left">
-            <p className="text-sm uppercase tracking-[0.35em] text-muted-foreground">{appMeta.author}</p>
+      <div className="app-shell h-full bg-gradient-to-br from-background via-background to-background/70 text-foreground">
+        <div className="mx-auto flex h-full w-full max-w-6xl flex-col gap-4 px-6 py-10">
+          <header className="app-draggable select-none space-y-2 text-center md:text-left">
             <h1 className="text-4xl font-semibold tracking-tight md:text-5xl">{appMeta.name}</h1>
             <p className="max-w-2xl text-base text-muted-foreground md:text-lg">{t('appTagline')}</p>
           </header>
 
-          <Tabs value={view} onValueChange={(value) => setView(value as typeof view)} className="space-y-6">
-            <TabsList className="grid w-full grid-cols-3 bg-white/10 text-white shadow-xl backdrop-blur-lg">
-              <TabsTrigger value="main">{t('viewMain')}</TabsTrigger>
-              <TabsTrigger value="settings">{t('settings')}</TabsTrigger>
-              <TabsTrigger value="about">{t('about')}</TabsTrigger>
-            </TabsList>
+          <main className="app-draggable flex flex-1 flex-col overflow-hidden">
+            <div className="app-no-drag flex h-full flex-col gap-4">
+              <Tabs value={view} onValueChange={(value) => setView(value as typeof view)} className="flex h-full flex-col gap-4">
+                <TabsList className="grid w-full grid-cols-3 shadow-xl backdrop-blur-lg">
+                  <TabsTrigger value="main">{t('viewMain')}</TabsTrigger>
+                  <TabsTrigger value="settings">{t('settings')}</TabsTrigger>
+                  <TabsTrigger value="about">{t('about')}</TabsTrigger>
+                </TabsList>
+                <div className="flex h-full flex-col overflow-hidden border-none p-0">
+                  <TabsContent value="main" className="h-full overflow-hidden">
+                    <div className="h-full overflow-auto pr-2">
+                      <MainScreen
+                        status={status}
+                        logs={logs}
+                        jobs={tickerJobs}
+                        progress={progress}
+                        summary={summary}
+                        isHydrated={loaded}
+                        onStart={startScrape}
+                        onCancel={cancelScrape}
+                        onOpenSummary={openSummaryFolderAndExit}
+                        onNavigate={(destination) => setView(destination)}
+                      />
+                    </div>
+                  </TabsContent>
+                  <TabsContent value="settings" className="h-full overflow-auto pr-2">
+                    <SettingsScreen />
+                  </TabsContent>
+                  <TabsContent value="about" className="h-full overflow-auto pr-2">
+                    <AboutScreen onOpenExternal={openExternal} />
+                  </TabsContent>
+                </div>
+              </Tabs>
+            </div>
+          </main>
 
-            <TabsContent value="main">
-              <MainScreen
-                status={status}
-                logs={logs}
-                jobs={tickerJobs}
-                progress={progress}
-                summary={summary}
-                isHydrated={loaded}
-                onStart={startScrape}
-                onCancel={cancelScrape}
-                onOpenSummary={openSummaryFolderAndExit}
-                onNavigate={(destination) => setView(destination)}
-              />
-            </TabsContent>
-
-            <TabsContent value="settings">
-              <SettingsScreen />
-            </TabsContent>
-
-            <TabsContent value="about">
-              <AboutScreen onOpenExternal={openExternal} />
-            </TabsContent>
-          </Tabs>
-
-          <footer className="flex flex-col gap-3 border-t border-border/40 pt-6 text-sm text-muted-foreground md:flex-row md:items-center md:justify-between">
-            <span>
-              {t('authorLabel')}: {appMeta.author}
-            </span>
-            <span>
-              {t('versionLabel')}: v{appMeta.version}
-            </span>
+          <footer className="app-no-drag mt-2 rounded-2xl border border-white/20 bg-black/25 px-4 py-3 text-xs text-muted-foreground shadow-2xl backdrop-blur">
+            <div className="flex flex-col gap-2 text-center md:flex-row md:items-center md:justify-between md:text-left">
+              <span>
+                {t('authorLabel')}: {appMeta.author}
+              </span>
+              <span>
+                {t('versionLabel')}: v{appMeta.version}
+              </span>
+            </div>
           </footer>
         </div>
       </div>

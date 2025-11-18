@@ -53,6 +53,30 @@
 
 body {
   @apply bg-background text-foreground antialiased;
-  min-height: 100vh;
+  height: 100vh;
   margin: 0;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+#root {
+  height: 100%;
+}
+
+.app-draggable {
+  -webkit-app-region: drag;
+}
+
+.app-no-drag {
+  -webkit-app-region: no-drag;
+}
+
+input,
+textarea,
+select,
+.text-selectable {
+  -webkit-app-region: no-drag;
+  user-select: text;
+  -webkit-user-select: text;
 }

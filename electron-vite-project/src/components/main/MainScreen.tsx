@@ -46,7 +46,7 @@ export const MainScreen = ({
   const canStart = isHydrated && status !== 'running'
 
   return (
-    <div className="space-y-6">
+    <div className="flex h-full flex-col gap-6">
       <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
         <AnimatedOrb
           status={status}
@@ -103,10 +103,10 @@ export const MainScreen = ({
         </div>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
-        <LogsPanel logs={logs} title={t('logs')} emptyText={t('logsEmpty')} />
+      <div className="flex flex-col gap-4 lg:flex-row">
+        <LogsPanel logs={logs} title={t('logs')} emptyText={t('logsEmpty')} className="lg:w-2/3" />
 
-        <div className="rounded-3xl border border-white/10 bg-white/5 p-6 text-sm text-muted-foreground backdrop-blur-md">
+        <div className="rounded-3xl border border-white/10 bg-white/5 p-6 text-sm text-muted-foreground backdrop-blur-md lg:flex-1">
           <div className="flex items-center gap-3 text-base text-white">
             <Terminal className="h-4 w-4" />
             <span>{t('runningStatus')}</span>

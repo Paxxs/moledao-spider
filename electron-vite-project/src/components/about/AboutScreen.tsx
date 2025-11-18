@@ -54,7 +54,7 @@ export const AboutScreen = ({ onOpenExternal }: Props) => {
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button variant="link" className="h-auto p-0" onClick={() => onOpenExternal(appMeta.contact)}>
-                    {appMeta.contact}
+                    <span className="text-selectable">{appMeta.contact}</span>
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>{t('contactLabel')}</TooltipContent>

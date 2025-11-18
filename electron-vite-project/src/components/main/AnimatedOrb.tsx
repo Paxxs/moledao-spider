@@ -5,10 +5,12 @@ import { useMemo } from 'react'
 import type { JobTickerItem } from '@/types/ipc'
 
 const orbLayers = [
-  { size: 230, color: 'linear-gradient(135deg, rgba(168, 85, 247, 0.7), rgba(236, 72, 153, 0.6), rgba(6, 182, 212, 0.7))', duration: 8 },
-  { size: 280, color: 'linear-gradient(135deg, rgba(59, 130, 246, 0.6), rgba(139, 92, 246, 0.4), rgba(14, 165, 233, 0.5))', duration: 12 },
-  { size: 320, color: 'linear-gradient(135deg, rgba(16, 185, 129, 0.4), rgba(6, 182, 212, 0.4), rgba(168, 85, 247, 0.3))', duration: 16 },
+  { size: 220, color: 'linear-gradient(135deg, rgba(168, 85, 247, 0.65), rgba(236, 72, 153, 0.5), rgba(6, 182, 212, 0.6))', duration: 9 },
+  { size: 280, color: 'linear-gradient(135deg, rgba(59, 130, 246, 0.5), rgba(139, 92, 246, 0.45), rgba(14, 165, 233, 0.5))', duration: 13 },
+  { size: 340, color: 'linear-gradient(135deg, rgba(16, 185, 129, 0.35), rgba(6, 182, 212, 0.35), rgba(168, 85, 247, 0.3))', duration: 17 },
 ]
+
+const CARD_RADIUS = 120
 
 interface Props {
   status: 'idle' | 'running' | 'completed' | 'error'
@@ -23,6 +25,17 @@ export const AnimatedOrb = ({ status, jobs, idleText, runningText, completedText
   const isCompleted = status === 'completed'
 
   const jobKey = useMemo(() => jobs.map((job) => job.id).join('-'), [jobs])
+  const positions = useMemo(() => {
+    const total = Math.max(jobs.length, 4)
+    return jobs.map((_, idx) => {
+      const angle = ((idx % total) / total) * 360 + idx * 12
+      const radians = (angle * Math.PI) / 180
+      return {
+        x: Math.cos(radians) * CARD_RADIUS,
+        y: Math.sin(radians) * (CARD_RADIUS * 0.55),
+      }
+    })
+  }, [jobs])
 
   return (
     <div className="relative flex h-[320px] w-full items-center justify-center overflow-hidden rounded-3xl bg-gradient-to-br from-slate-950/80 via-slate-900/40 to-slate-950/80 p-6">
@@ -33,9 +46,9 @@ export const AnimatedOrb = ({ status, jobs, idleText, runningText, completedText
             className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full blur-3xl"
             style={{ width: layer.size, height: layer.size, backgroundImage: layer.color }}
             animate={{
-              scale: [0.85, 1.08, 0.95],
-              rotate: [0, 120, 240],
-              opacity: [0.45, 0.9, 0.6],
+              scale: [0.85, 1.1, 0.92],
+              rotate: [0, 160, 320],
+              opacity: [0.4, 0.85, 0.55],
             }}
             transition={{ duration: layer.duration, repeat: Infinity, ease: 'easeInOut' }}
           />
@@ -57,19 +70,28 @@ export const AnimatedOrb = ({ status, jobs, idleText, runningText, completedText
 
       {isRunning && jobs.length > 0 && (
         <motion.div key={jobKey} className="pointer-events-none absolute inset-0 z-20">
-          {jobs.map((job, idx) => (
-            <motion.div
-              key={job.id}
-              initial={{ opacity: 0, scale: 0.8, y: 40 }}
-              animate={{ opacity: [0, 1, 0], scale: [0.8, 1.05, 0.7], y: [-20, -80, -120], x: [-20 + idx * 10, 0, 20 - idx * 10] }}
-              transition={{ duration: 2.3, delay: idx * 0.2, ease: 'easeInOut' }}
-              className="absolute left-1/2 top-1/2 min-w-[220px] -translate-x-1/2 rounded-2xl border border-white/20 bg-white/15 px-4 py-3 text-sm text-white shadow-2xl backdrop-blur-lg"
-            >
-              <p className="font-semibold leading-tight">{job.company}</p>
-              <p className="text-xs text-white/80">{job.title}</p>
-              <p className="mt-2 text-[11px] uppercase tracking-[0.38em] text-emerald-200">{job.preference}</p>
-            </motion.div>
-          ))}
+          {jobs.map((job, idx) => {
+            const { x, y } = positions[idx] ?? { x: 0, y: 0 }
+            const float = (idx % 2 === 0 ? 1 : -1) * 18
+            return (
+              <motion.div
+                key={job.id}
+                initial={{ opacity: 0, scale: 0.8, x: 0, y: 0 }}
+                animate={{
+                  opacity: [0, 1, 1, 0],
+                  scale: [0.8, 1, 1, 0.8],
+                  x: [0, x * 0.6, x],
+                  y: [0, y * 0.6, y + float],
+                }}
+                transition={{ duration: 3.6, delay: idx * 0.15, ease: 'easeInOut' }}
+                className="absolute left-1/2 top-1/2 min-w-[220px] -translate-x-1/2 rounded-2xl border border-white/20 bg-white/15 px-4 py-3 text-sm text-white shadow-2xl backdrop-blur-lg"
+              >
+                <p className="font-semibold leading-tight">{job.company}</p>
+                <p className="text-xs text-white/80">{job.title}</p>
+                <p className="mt-2 text-[11px] uppercase tracking-[0.38em] text-emerald-200">{job.preference}</p>
+              </motion.div>
+            )
+          })}
         </motion.div>
       )}
     </div>

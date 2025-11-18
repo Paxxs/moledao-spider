@@ -9,9 +9,10 @@ interface Props {
   logs: LogEntry[]
   title: string
   emptyText: string
+  className?: string
 }
 
-export const LogsPanel = ({ logs, title, emptyText }: Props) => {
+export const LogsPanel = ({ logs, title, emptyText, className }: Props) => {
   const formatted = useMemo(
     () =>
       logs.map((item) => ({
@@ -22,13 +23,13 @@ export const LogsPanel = ({ logs, title, emptyText }: Props) => {
   )
 
   return (
-    <div className="flex h-full flex-col rounded-3xl border border-white/10 bg-black/30 p-4 backdrop-blur-lg">
+    <div className={cn('flex h-72 flex-col rounded-3xl border border-white/10 bg-black/30 p-4 backdrop-blur-lg', className)}>
       <div className="mb-3 flex items-center justify-between">
         <h3 className="text-sm font-semibold uppercase tracking-[0.3em] text-muted-foreground">{title}</h3>
         <span className="text-xs text-muted-foreground">{logs.length}</span>
       </div>
-      <ScrollArea className="grow">
-        <div className="space-y-2 pr-2">
+      <ScrollArea className="grow pr-2 text-selectable">
+        <div className="space-y-2">
           {formatted.length === 0 && <p className="text-sm text-muted-foreground/80">{emptyText}</p>}
           {formatted.map((entry) => (
             <motion.div
@@ -41,7 +42,7 @@ export const LogsPanel = ({ logs, title, emptyText }: Props) => {
                 <span>{entry.time}</span>
                 <span className="uppercase tracking-[0.3em]">{entry.level}</span>
               </div>
-              <p className="mt-1 font-mono text-[11px] text-white/90">{entry.message}</p>
+              <p className="text-selectable mt-1 font-mono text-[11px] text-white/90">{entry.message}</p>
             </motion.div>
           ))}
         </div>
