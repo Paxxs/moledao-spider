@@ -45,6 +45,8 @@ export interface ElectronAPI {
   getSettings: () => Promise<AppSettings>
   saveSettings: (settings: AppSettings) => Promise<AppSettings>
   getAppMeta: () => Promise<AppMetadata>
+  openExternalLink: (url: string) => Promise<void>
+  openSummaryFolderAndExit: () => Promise<void>
   onLog: (callback: (entry: LogEntry) => void) => () => void
   onStatus: (callback: (status: ScrapeStatus) => void) => () => void
   onJobBatch: (callback: (batch: JobTickerItem[]) => void) => () => void

@@ -1,0 +1,124 @@
+import { useTranslation } from 'react-i18next'
+import { ArrowRight, Info, Settings, Terminal } from 'lucide-react'
+
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { AnimatedOrb } from '@/components/main/AnimatedOrb'
+import { LogsPanel } from '@/components/main/LogsPanel'
+import { appMeta } from '@/lib/meta'
+import type { JobTickerItem, LogEntry, ProgressPayload, RunSummary, ScrapeStatus } from '@/types/ipc'
+
+const statusColorMap: Record<ScrapeStatus, string> = {
+  idle: 'bg-muted text-muted-foreground',
+  running: 'bg-amber-400/20 text-amber-200',
+  completed: 'bg-emerald-400/20 text-emerald-200',
+  error: 'bg-red-400/20 text-red-200',
+}
+
+interface Props {
+  status: ScrapeStatus
+  logs: LogEntry[]
+  jobs: JobTickerItem[]
+  progress: ProgressPayload | null
+  summary: RunSummary | null
+  isHydrated: boolean
+  onStart: () => Promise<void>
+  onCancel: () => Promise<void>
+  onOpenSummary: () => Promise<void>
+  onNavigate: (view: 'settings' | 'about') => void
+}
+
+export const MainScreen = ({
+  status,
+  logs,
+  jobs,
+  progress,
+  summary,
+  isHydrated,
+  onStart,
+  onCancel,
+  onOpenSummary,
+  onNavigate,
+}: Props) => {
+  const { t } = useTranslation()
+  const isRunning = status === 'running'
+  const isCompleted = status === 'completed'
+  const canStart = isHydrated && status !== 'running'
+
+  return (
+    <div className="space-y-6">
+      <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+        <AnimatedOrb
+          status={status}
+          jobs={jobs}
+          idleText={t('idleStatus')}
+          runningText={t('runningStatus')}
+          completedText={t('completeStatus')}
+        />
+
+        <div className="flex flex-col gap-4 rounded-3xl border border-white/10 bg-white/5 p-6 shadow-2xl backdrop-blur-md">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs uppercase tracking-[0.4em] text-muted-foreground">{appMeta.author}</p>
+              <h3 className="text-2xl font-semibold leading-tight">{appMeta.name}</h3>
+            </div>
+            <Badge variant="outline" className={statusColorMap[status]}>
+              {status.toUpperCase()}
+            </Badge>
+          </div>
+
+          <p className="text-sm text-muted-foreground">{t('appTagline')}</p>
+
+          <div className="grid gap-3 text-sm">
+            <div className="rounded-2xl bg-black/20 p-4">
+              <p className="text-xs uppercase tracking-[0.4em] text-muted-foreground">{t('logs')}</p>
+              <p className="mt-2 text-xl font-semibold text-white/90">
+                {progress ? (
+                  <span>
+                    {progress.processed}/{progress.total}
+                    <span className="pl-1 text-sm font-normal text-muted-foreground">{t('jobsLabel')}</span>
+                  </span>
+                ) : (
+                  <span className="text-base font-normal text-muted-foreground">{t('idleStatus')}</span>
+                )}
+              </p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <Button size="lg" className="group" disabled={!canStart} onClick={() => (isRunning ? onCancel() : onStart())}>
+              {isRunning ? t('stopScraping') : t('startScraping')}
+              <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+            </Button>
+            <Button variant="secondary" size="lg" onClick={() => onNavigate('settings')}>
+              <Settings className="mr-2 h-4 w-4" />
+              {t('settings')}
+            </Button>
+          </div>
+
+          <Button variant="ghost" className="justify-start text-muted-foreground" onClick={() => onNavigate('about')}>
+            <Info className="mr-2 h-4 w-4" />
+            {t('openAbout')}
+          </Button>
+        </div>
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
+        <LogsPanel logs={logs} title={t('logs')} emptyText={t('logsEmpty')} />
+
+        <div className="rounded-3xl border border-white/10 bg-white/5 p-6 text-sm text-muted-foreground backdrop-blur-md">
+          <div className="flex items-center gap-3 text-base text-white">
+            <Terminal className="h-4 w-4" />
+            <span>{t('runningStatus')}</span>
+          </div>
+          <p className="mt-3 text-muted-foreground">{t('orbHint')}</p>
+          {isCompleted && summary && (
+            <Button className="mt-6 w-full" onClick={() => onOpenSummary()}>
+              {t('exitAndOpen')}
+            </Button>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
