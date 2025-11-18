@@ -10,7 +10,9 @@ import type {
 } from '@/types/ipc'
 
 const MAX_LOG_LINES = 200
-const JOB_DISPLAY_WINDOW = 2600
+const SIMULATION_JOB_DELAY_MS = 2200
+const SIMULATION_BATCH_PAUSE_MS = 2800
+const JOB_DISPLAY_WINDOW = 3600
 
 const sampleJobs: JobTickerItem[] = [
   { id: '1', company: 'GREENWICH OASIS CAPITAL', title: 'Fund Operations Specialist', preference: 'Office Only' },
@@ -85,7 +87,7 @@ export const useScraperBridge = () => {
     setSummary(null)
 
     sampleJobs.forEach((job, index) => {
-      const delay = index * 1200
+      const delay = index * SIMULATION_JOB_DELAY_MS
       const timer = setTimeout(() => {
         setLogs((prev) => [
           ...prev.slice(-(MAX_LOG_LINES - 1)),
@@ -95,8 +97,11 @@ export const useScraperBridge = () => {
         setJobCycle((cycle) => cycle + 1)
         setProgress({ processed: index + 1, total: sampleJobs.length })
         if (index === sampleJobs.length - 1) {
-          setSummary({ outputDirectory: '/tmp/mock-output', files: ['jobs-001.docx'] })
-          setStatus('completed')
+          const doneTimer = setTimeout(() => {
+            setSummary({ outputDirectory: '/tmp/mock-output', files: ['jobs-001.docx'] })
+            setStatus('completed')
+          }, SIMULATION_BATCH_PAUSE_MS)
+          timers.current.push(doneTimer)
         }
       }, delay)
       timers.current.push(timer)

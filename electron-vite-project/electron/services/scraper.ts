@@ -59,7 +59,9 @@ const regionFormatter = new Intl.DisplayNames(['en'], { type: 'region' })
 const relativeFormatter = new Intl.RelativeTimeFormat('en', { numeric: 'auto' })
 
 const TICKER_BATCH_SIZE = 3
-const TICKER_DELAY_MS = 1100
+const SCRAPE_THROTTLE_DELAY_MS = 1500
+const ANIMATION_BATCH_DELAY_MS = 2800
+const POST_ANIMATION_IDLE_DELAY_MS = 500
 
 const sanitizeOptions: IOptions = {
   allowedTags: ['p', 'br', 'ul', 'ol', 'li', 'strong', 'em', 'b', 'i'],
@@ -242,8 +244,11 @@ export class ScraperService {
         if (tickerBuffer.length >= TICKER_BATCH_SIZE || index === listEntries.length - 1) {
           this.emitJobBatch([...tickerBuffer])
           tickerBuffer.length = 0
-          await sleep(TICKER_DELAY_MS)
+          await sleep(ANIMATION_BATCH_DELAY_MS)
+          await sleep(POST_ANIMATION_IDLE_DELAY_MS)
         }
+
+        await sleep(SCRAPE_THROTTLE_DELAY_MS)
       }
 
       if (this.cancelRequested) {
