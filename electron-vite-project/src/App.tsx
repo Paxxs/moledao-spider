@@ -47,27 +47,26 @@ function App() {
                   <TabsTrigger value="settings">{t('settings')}</TabsTrigger>
                   <TabsTrigger value="about">{t('about')}</TabsTrigger>
                 </TabsList>
-                <div className="flex h-full flex-col overflow-hidden border-none p-0">
-                  <TabsContent value="main" className="h-full overflow-hidden">
-                    <div className="h-full overflow-auto pr-2">
-                      <MainScreen
-                        status={status}
-                        logs={logs}
-                        jobs={tickerJobs}
-                        progress={progress}
-                        summary={summary}
-                        isHydrated={loaded}
-                        onStart={startScrape}
-                        onCancel={cancelScrape}
-                        onOpenSummary={openSummaryFolderAndExit}
-                        onNavigate={(destination) => setView(destination)}
-                      />
-                    </div>
+                <div className="flex h-full flex-col overflow-hidden border-none p-0" >
+                  <TabsContent value="main" className="h-full overflow-auto p-0 rounded-3xl">
+                    <MainScreen
+                      status={status}
+                      logs={logs}
+                      jobs={tickerJobs}
+                      progress={progress}
+                      summary={summary}
+                      isHydrated={loaded}
+                      onStart={startScrape}
+                      onCancel={cancelScrape}
+                      onOpenSummary={openSummaryFolderAndExit}
+                      onNavigate={(destination) => setView(destination)}
+                    />
+
                   </TabsContent>
-                  <TabsContent value="settings" className="h-full overflow-auto pr-2">
+                  <TabsContent value="settings" className="h-full overflow-auto">
                     <SettingsScreen />
                   </TabsContent>
-                  <TabsContent value="about" className="h-full overflow-auto pr-2">
+                  <TabsContent value="about" className="h-full overflow-auto p-11">
                     <AboutScreen onOpenExternal={openExternal} />
                   </TabsContent>
                 </div>

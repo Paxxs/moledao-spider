@@ -6,8 +6,8 @@ import type { JobTickerItem } from '@/types/ipc'
 
 const orbLayers = [
   { size: 220, color: 'linear-gradient(135deg, rgba(168, 85, 247, 0.65), rgba(236, 72, 153, 0.5), rgba(6, 182, 212, 0.6))', duration: 9 },
-  { size: 280, color: 'linear-gradient(135deg, rgba(59, 130, 246, 0.5), rgba(139, 92, 246, 0.45), rgba(14, 165, 233, 0.5))', duration: 13 },
-  { size: 340, color: 'linear-gradient(135deg, rgba(16, 185, 129, 0.35), rgba(6, 182, 212, 0.35), rgba(168, 85, 247, 0.3))', duration: 17 },
+  { size: 280, color: 'linear-gradient(135deg, rgba(137, 107, 41, 0.96), rgba(139, 92, 246, 0.45), rgba(182, 48, 48, 0.5))', duration: 13 },
+  { size: 340, color: 'linear-gradient(135deg, rgba(141, 242, 9, 0.35), rgba(255, 255, 255, 0.35), rgba(182, 111, 249, 0.88))', duration: 17 },
 ]
 
 const CARD_RADIUS = 120
@@ -38,12 +38,12 @@ export const AnimatedOrb = ({ status, jobs, idleText, runningText, completedText
   }, [jobs])
 
   return (
-    <div className="relative flex h-[320px] w-full items-center justify-center overflow-hidden rounded-3xl bg-gradient-to-br from-slate-950/80 via-slate-900/40 to-slate-950/80 p-6">
+    <div className="relative flex min-h-[320px] w-full items-center justify-center overflow-hidden rounded-3xl bg-gradient-to-br from-slate-950/80 via-slate-900/40 to-slate-950/80 p-6">
       <div className="absolute inset-6 overflow-visible">
         {orbLayers.map((layer, index) => (
           <motion.div
             key={`orb-${index}`}
-            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full blur-3xl"
+            className="absolute left-1/4 top-1/4 -translate-x-1/2 -translate-y-1/2 rounded-full blur-3xl"
             style={{ width: layer.size, height: layer.size, backgroundImage: layer.color }}
             animate={{
               scale: [0.85, 1.1, 0.92],
@@ -84,7 +84,7 @@ export const AnimatedOrb = ({ status, jobs, idleText, runningText, completedText
                   y: [0, y * 0.6, y + float],
                 }}
                 transition={{ duration: 3.6, delay: idx * 0.15, ease: 'easeInOut' }}
-                className="absolute left-1/2 top-1/2 min-w-[220px] -translate-x-1/2 rounded-2xl border border-white/20 bg-white/15 px-4 py-3 text-sm text-white shadow-2xl backdrop-blur-lg"
+                className="absolute left-1/4 top-1/4 min-w-[220px] -translate-x-1/2 rounded-2xl border border-white/20 bg-white/15 px-4 py-3 text-sm text-white shadow-2xl backdrop-blur-lg"
               >
                 <p className="font-semibold leading-tight">{job.company}</p>
                 <p className="text-xs text-white/80">{job.title}</p>

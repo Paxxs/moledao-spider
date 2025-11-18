@@ -10,9 +10,9 @@ import type { JobTickerItem, LogEntry, ProgressPayload, RunSummary, ScrapeStatus
 
 const statusColorMap: Record<ScrapeStatus, string> = {
   idle: 'bg-muted text-muted-foreground',
-  running: 'bg-amber-400/20 text-amber-200',
-  completed: 'bg-emerald-400/20 text-emerald-200',
-  error: 'bg-red-400/20 text-red-200',
+  running: 'bg-amber-400 text-emerald-200 text-black',
+  completed: 'bg-blue-500 text-emerald-200',
+  error: 'bg-red-700 text-red-200',
 }
 
 interface Props {
@@ -106,8 +106,8 @@ export const MainScreen = ({
       <div className="flex flex-col gap-4 lg:flex-row">
         <LogsPanel logs={logs} title={t('logs')} emptyText={t('logsEmpty')} className="lg:w-2/3" />
 
-        <div className="rounded-3xl border border-white/10 bg-white/5 p-6 text-sm text-muted-foreground backdrop-blur-md lg:flex-1">
-          <div className="flex items-center gap-3 text-base text-white">
+        <div className="rounded-3xl border border-white/10 bg-white/5 p-6 text-sm text-muted-foreground bg-sky-500/30 backdrop-blur-md lg:flex-1">
+          <div className="flex items-center gap-3 text-base text-black dark:text-white">
             <Terminal className="h-4 w-4" />
             <span>{t('runningStatus')}</span>
           </div>

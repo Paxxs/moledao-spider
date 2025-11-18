@@ -20,22 +20,23 @@ export const AboutScreen = ({ onOpenExternal }: Props) => {
     <Card className="min-h-[480px] border border-white/10 bg-white/5 shadow-2xl backdrop-blur-lg">
       <CardHeader>
         <CardTitle>{t('aboutTitle')}</CardTitle>
-        <CardDescription>{t('aboutDescription')}</CardDescription>
+        <CardDescription>{t('appTagline')}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="flex flex-wrap gap-4">
           <Badge variant="secondary" className="text-xs uppercase tracking-[0.3em]">
             v{appMeta.version}
           </Badge>
-          <Badge variant="outline" className="border-emerald-400/30 text-emerald-200">
-            AI Animation + Word Export
+          <Badge variant="outline" className="bg-amber-700 text-emerald-200">
+            Ai Word Export
           </Badge>
         </div>
 
         <ScrollArea className="h-48 pr-4 text-sm text-muted-foreground">
           <p className="leading-relaxed text-base text-foreground/90">{t('aboutDescription')}</p>
           <p className="mt-4">
-            {t('appTagline')}
+            Made with ❤️ by SuperPaxos <br />
+            © MorFans.cn. All rights reserved.
           </p>
         </ScrollArea>
 
@@ -63,6 +64,6 @@ export const AboutScreen = ({ onOpenExternal }: Props) => {
           </div>
         </div>
       </CardContent>
-    </Card>
+    </Card >
   )
 }
