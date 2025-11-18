@@ -6,6 +6,7 @@ import path from 'node:path'
 import { Document, HeadingLevel, Packer, Paragraph, TextRun } from 'docx'
 import sanitizeHtml, { type IOptions } from 'sanitize-html'
 import fetch from 'node-fetch'
+import { fileURLToPath } from 'node:url'
 
 import type { AppSettings, FieldKey } from '../../src/types/settings'
 import type { JobTickerItem, LogEntry, ProgressPayload, RunSummary, ScrapeStatus } from '../../src/types/ipc'
@@ -45,10 +46,12 @@ const JOB_LIST_URL =
 
 const JOB_DETAIL_URL = 'https://api.moledao.io/api/career/details?id='
 
+const moduleDir = path.dirname(fileURLToPath(import.meta.url))
+
 const resolveHarBase = () => {
-  const primary = path.join(process.env.APP_ROOT ?? __dirname, 'har')
+  const primary = path.join(process.env.APP_ROOT ?? moduleDir, 'har')
   if (fsSync.existsSync(primary)) return primary
-  return path.resolve(process.env.APP_ROOT ?? __dirname, '../har')
+  return path.resolve(process.env.APP_ROOT ?? moduleDir, '../har')
 }
 
 const HAR_BASE = resolveHarBase()
