@@ -147,7 +147,7 @@ export const MainScreen = ({
       <div className="flex flex-col gap-4 lg:flex-row">
         <LogsPanel logs={logs} title={t('logs')} emptyText={t('logsEmpty')} className="lg:w-2/3" />
 
-        <div className="rounded-3xl border border-white/10 bg-white/5 p-6 text-sm text-muted-foreground bg-sky-500/30 backdrop-blur-md lg:flex-1">
+        <div className="rounded-3xl border border-white/10 bg-white/5 p-6 text-sm text-muted-foreground bg-sky-500/30 backdrop-blur-md lg:flex-1 shadow">
           <div className="flex items-center gap-3 text-base text-black dark:text-white">
             <Terminal className="h-4 w-4" />
             <span>{t('runningStatus')}</span>

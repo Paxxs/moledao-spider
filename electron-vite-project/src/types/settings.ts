@@ -1,6 +1,7 @@
 import type { LocaleKey } from '@/i18n/resources'
 
 export type FieldKey = 'location' | 'type' | 'preferences' | 'experience' | 'tag'
+export type ThemePreference = 'system' | 'light' | 'dark'
 
 export const FIELD_LABEL_MAP: Record<FieldKey, { i18nKey: string }> = {
   location: { i18nKey: 'field.location' },
@@ -16,6 +17,7 @@ export interface AppSettings {
   fieldOrder: FieldKey[]
   hiddenFields: FieldKey[]
   language: LocaleKey | 'system'
+  theme: ThemePreference
 }
 
 export const defaultSettings: AppSettings = {
@@ -24,4 +26,5 @@ export const defaultSettings: AppSettings = {
   fieldOrder: ['location', 'preferences', 'type', 'experience', 'tag'],
   hiddenFields: [],
   language: 'system',
+  theme: 'system',
 }

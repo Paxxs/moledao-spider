@@ -3,6 +3,8 @@ import { app } from 'electron'
 
 import { type AppSettings, defaultSettings } from '../../src/types/settings'
 
+const THEME_OPTIONS = new Set<AppSettings['theme']>(['system', 'light', 'dark'])
+
 let store: Store<AppSettings> | null = null
 
 const getStore = () => {
@@ -24,6 +26,7 @@ export const writeSettings = (settings: AppSettings): AppSettings => {
     ...defaultSettings,
     ...settings,
     jobsPerDoc: Math.min(20, Math.max(1, Math.floor(settings.jobsPerDoc ?? defaultSettings.jobsPerDoc))),
+    theme: THEME_OPTIONS.has(settings.theme) ? settings.theme : defaultSettings.theme,
   }
   getStore().store = sanitized
   return sanitized

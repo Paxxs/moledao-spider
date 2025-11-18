@@ -48,7 +48,7 @@ function App() {
                   <TabsTrigger value="about">{t('about')}</TabsTrigger>
                 </TabsList>
                 <div className="flex h-full flex-col overflow-hidden border-none p-0" >
-                  <TabsContent value="main" className="h-full overflow-auto p-0 rounded-3xl">
+                  <TabsContent value="main" className="h-full overflow-auto p-2 rounded-3xl">
                     <MainScreen
                       status={status}
                       logs={logs}

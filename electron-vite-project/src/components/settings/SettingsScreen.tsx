@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { DndContext, PointerSensor, closestCenter, useSensor, useSensors, type DragEndEvent } from '@dnd-kit/core'
 import { SortableContext, arrayMove, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { FolderOpen, GripVertical, Languages, Rows2 } from 'lucide-react'
+import { FolderOpen, GripVertical, Languages, Palette, Rows2 } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -96,6 +96,12 @@ export const SettingsScreen = () => {
     applyChange((prev) => ({ ...prev, jobsPerDoc: nextValue }))
   }
 
+  const handleThemeChange = (value: string) => {
+    if (value === 'system' || value === 'light' || value === 'dark') {
+      applyChange((prev) => ({ ...prev, theme: value }))
+    }
+  }
+
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event
     if (!over || active.id === over.id) return
@@ -168,6 +174,24 @@ export const SettingsScreen = () => {
               </SelectContent>
             </Select>
             <p className="text-xs text-muted-foreground">{t('languageHint')}</p>
+          </div>
+
+          <div className="space-y-2">
+            <Label className="flex items-center gap-2">
+              <Palette className="h-4 w-4" />
+              {t('themeLabel')}
+            </Label>
+            <Select value={settings.theme} onValueChange={handleThemeChange}>
+              <SelectTrigger>
+                <SelectValue placeholder={t('themeSystem')} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="system">{t('themeSystem')}</SelectItem>
+                <SelectItem value="light">{t('themeLight')}</SelectItem>
+                <SelectItem value="dark">{t('themeDark')}</SelectItem>
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-muted-foreground">{t('themeHint')}</p>
           </div>
         </CardContent>
       </Card>

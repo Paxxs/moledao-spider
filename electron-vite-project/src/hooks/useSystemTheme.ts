@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
 
+import { useSettingsStore } from '@/store/settings'
+
 type ThemeMode = 'light' | 'dark'
 
 const getPreferred = (): ThemeMode => {
@@ -8,25 +10,29 @@ const getPreferred = (): ThemeMode => {
 }
 
 export const useSystemTheme = () => {
-  const [theme, setTheme] = useState<ThemeMode>(getPreferred)
+  const preference = useSettingsStore((state) => state.settings.theme)
+  const [systemTheme, setSystemTheme] = useState<ThemeMode>(getPreferred)
 
   useEffect(() => {
     const media = window.matchMedia('(prefers-color-scheme: light)')
-    const handler = () => setTheme(media.matches ? 'light' : 'dark')
+    const handler = () => setSystemTheme(media.matches ? 'light' : 'dark')
+    handler()
     media.addEventListener('change', handler)
     return () => media.removeEventListener('change', handler)
   }, [])
 
+  const activeTheme: ThemeMode = preference === 'system' ? systemTheme : preference
+
   useEffect(() => {
     const root = document.documentElement
-    if (theme === 'light') {
+    if (activeTheme === 'light') {
       root.classList.add('light')
       root.classList.remove('dark')
     } else {
       root.classList.add('dark')
       root.classList.remove('light')
     }
-  }, [theme])
+  }, [activeTheme])
 
-  return theme
+  return activeTheme
 }
