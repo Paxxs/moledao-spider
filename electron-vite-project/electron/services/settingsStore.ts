@@ -1,7 +1,7 @@
 import Store from 'electron-store'
 import { app } from 'electron'
 
-import { type AppSettings, defaultSettings } from '@/types/settings'
+import { type AppSettings, defaultSettings } from '../../src/types/settings'
 
 let store: Store<AppSettings> | null = null
 

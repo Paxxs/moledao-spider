@@ -5,9 +5,10 @@ import path from 'node:path'
 
 import { Document, HeadingLevel, Packer, Paragraph, TextRun } from 'docx'
 import sanitizeHtml, { type IOptions } from 'sanitize-html'
+import fetch from 'node-fetch'
 
-import type { AppSettings, FieldKey } from '@/types/settings'
-import type { JobTickerItem, LogEntry, ProgressPayload, RunSummary, ScrapeStatus } from '@/types/ipc'
+import type { AppSettings, FieldKey } from '../../src/types/settings'
+import type { JobTickerItem, LogEntry, ProgressPayload, RunSummary, ScrapeStatus } from '../../src/types/ipc'
 
 const preferenceMap: Record<number, string> = {
   1: 'Fully Remote',
@@ -38,6 +39,11 @@ const HAR_FILES = {
   list: 'moledao.io_api_career_list.har',
   detailChunks: ['moledao.io_api_career_details1.har', 'moledao.io_api_career_details2.har'],
 }
+
+const JOB_LIST_URL =
+  'https://api.moledao.io/api/career/list?id=&current=1&pageSize=300&tags=&sortStr=event.updateDate:DESC&name=&location=&role=&workType=&like=2&applied=2&workLanguage=&workExperience=&workPreferences=&status=&approve=1'
+
+const JOB_DETAIL_URL = 'https://api.moledao.io/api/career/details?id='
 
 const resolveHarBase = () => {
   const primary = path.join(process.env.APP_ROOT ?? __dirname, 'har')
@@ -195,21 +201,34 @@ export class ScraperService {
     this.emitStatus('running')
 
     try {
-      const listEntries = await this.loadList()
+      let listEntries = await this.fetchLiveList()
+      if (!listEntries.length) {
+        this.emitLog({ level: 'info', message: 'Live API returned no jobs, falling back to HAR snapshot.' })
+        listEntries = await this.loadList()
+      }
       if (!listEntries.length) {
         this.emitLog({ level: 'info', message: 'No jobs found in HAR snapshot.' })
         this.emitStatus('completed')
         this.running = false
         return
       }
-      const detailMap = await this.loadDetails()
+      let detailMapPromise: Promise<Map<string, DetailEntry>> | null = null
+      const getDetailMap = () => {
+        if (!detailMapPromise) {
+          detailMapPromise = this.loadDetails().catch(() => new Map<string, DetailEntry>())
+        }
+        return detailMapPromise
+      }
       const normalizedJobs: NormalizedJob[] = []
       const tickerBuffer: JobTickerItem[] = []
 
       for (let index = 0; index < listEntries.length; index += 1) {
         if (this.cancelRequested) break
         const entry = listEntries[index]
-        const detail = detailMap.get(entry.id) ?? (entry as DetailEntry)
+        const detail =
+          (await this.fetchLiveDetail(entry.id)) ??
+          (await getDetailMap()).get(entry.id) ??
+          (entry as DetailEntry)
         const normalized = this.normalizeJob(entry, detail)
         normalizedJobs.push(normalized)
 
@@ -327,6 +346,47 @@ export class ScraperService {
       contentParagraphs: contentParagraphs.length ? contentParagraphs : ['No description provided.'],
       relativeTime: formatRelativeTime(detailEntry.updateDate ?? listEntry.updateDate),
       updateDate: detailEntry.updateDate ?? listEntry.updateDate,
+    }
+  }
+
+  private async fetchLiveList(): Promise<ListEntry[]> {
+    try {
+      const response = await fetch(JOB_LIST_URL, {
+        headers: {
+          accept: 'application/json',
+          'user-agent': 'YuanJunjie-AiGrabber/1.0',
+        },
+      })
+      if (!response.ok) {
+        throw new Error(`List request failed (${response.status})`)
+      }
+      const payload = (await response.json()) as { data?: { list?: ListEntry[] } }
+      return payload.data?.list ?? []
+    } catch (error) {
+      this.emitLog({ level: 'error', message: `Live job list fetch failed: ${(error as Error).message}` })
+      return []
+    }
+  }
+
+  private async fetchLiveDetail(id: string): Promise<DetailEntry | null> {
+    try {
+      const response = await fetch(`${JOB_DETAIL_URL}${encodeURIComponent(id)}`, {
+        headers: {
+          accept: 'application/json',
+          'user-agent': 'YuanJunjie-AiGrabber/1.0',
+        },
+      })
+      if (!response.ok) {
+        throw new Error(`Detail request failed (${response.status})`)
+      }
+      const payload = (await response.json()) as { data?: DetailEntry }
+      return payload.data ?? null
+    } catch (error) {
+      this.emitLog({
+        level: 'error',
+        message: `Detail fetch failed for ${id}: ${(error as Error).message}. Will try HAR snapshot.`,
+      })
+      return null
     }
   }
 

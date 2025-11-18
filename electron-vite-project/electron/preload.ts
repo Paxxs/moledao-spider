@@ -1,7 +1,14 @@
 import { contextBridge, ipcRenderer, type IpcRendererEvent } from 'electron'
 
-import type { AppMetadata, JobTickerItem, LogEntry, ProgressPayload, RunSummary, ScrapeStatus } from '@/types/ipc'
-import type { AppSettings } from '@/types/settings'
+import type {
+  AppMetadata,
+  JobTickerItem,
+  LogEntry,
+  ProgressPayload,
+  RunSummary,
+  ScrapeStatus,
+} from '../src/types/ipc'
+import type { AppSettings } from '../src/types/settings'
 
 const subscribe = <T>(channel: string) => (callback: (payload: T) => void) => {
   const handler = (_event: IpcRendererEvent, payload: T) => callback(payload)
