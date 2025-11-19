@@ -1,6 +1,7 @@
 import { app, BrowserWindow, dialog, ipcMain, shell } from 'electron'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
+import os from 'node:os'
 
 import pkg from '../package.json'
 import { ScraperService } from './services/scraper'
@@ -125,4 +126,19 @@ const registerIpcHandlers = () => {
     contact: pkg.appContact ?? pkg.homepage ?? '',
     version: pkg.version ?? '0.0.0',
   }))
+
+  ipcMain.handle('app:host-info', () => {
+    try {
+      const { username } = os.userInfo()
+      return {
+        username,
+        hostname: os.hostname(),
+      }
+    } catch {
+      return {
+        username: null,
+        hostname: os.hostname(),
+      }
+    }
+  })
 }

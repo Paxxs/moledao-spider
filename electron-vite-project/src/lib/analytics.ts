@@ -6,13 +6,24 @@ const ANALYTICS_DOMAIN = 'ai-grab.nb.gl'
 const ANALYTICS_ENDPOINT = 'https://ap.apppro.dev/api/event'
 const ABOUT_SCREEN = 'about'
 
+type HostIdentity = {
+  username?: string | null
+  hostname?: string | null
+}
+
 let initialized = false
+let hostIdentity: HostIdentity = {}
 
 const buildPayload = (options?: PlausibleEventOptions): PlausibleEventOptions => {
-  const versionTag = appMeta.commit ? `${appMeta.version}+${appMeta.commit}` : appMeta.version
+  const versionTag = appMeta.commit ? `${appMeta.version}(${appMeta.commit})` : appMeta.version
+  const identityProps = {
+    ...(hostIdentity.username ? { user: hostIdentity.username } : {}),
+    ...(hostIdentity.hostname ? { machine: hostIdentity.hostname } : {}),
+  }
   const mergedProps = {
     version: versionTag,
     commit: appMeta.commit,
+    ...identityProps,
     ...(options?.props ?? {}),
   }
   if (!options) {
@@ -22,6 +33,10 @@ const buildPayload = (options?: PlausibleEventOptions): PlausibleEventOptions =>
     ...options,
     props: mergedProps,
   }
+}
+
+export const hydrateHostIdentity = (identity?: HostIdentity | null) => {
+  hostIdentity = identity ?? {}
 }
 
 const isBrowser = () => typeof window !== 'undefined'
