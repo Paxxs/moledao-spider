@@ -3,7 +3,6 @@
   "$schema": "https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json",
   "appId": "com.yuanjunjie.ai-grabber",
   "asar": true,
-  "productName": "Paxos 的 Ai 抓手",
   "directories": {
     "output": "release/${version}"
   },
