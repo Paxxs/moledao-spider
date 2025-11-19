@@ -7,4 +7,4 @@
 - [x] Implement the scraping service (list + detail fetch, lookup mapping, logging `[Company][Role]-[Preference]`) and throttle batches so each animation cycle handles 3–4 jobs.
 - [x] Generate DOCX files using the configured fields/order (company + role always first, content/time last), convert HTML content safely, batch jobs per configured count, and name files sequentially; surface “退出并打开保存的文件夹” once complete.
 - [x] Localize all user-facing strings (zh-CN, zh-TW, en) with system-locale detection and manual override; ensure typography adjusts with theme.
-- [ ] Add automated tests or integration checks covering settings persistence, language fallback, scraping/logging, export batching, and animation gating logic.
+- [x] Add automated tests or integration checks covering settings persistence, language fallback, scraping/logging, export batching, and animation gating logic.
