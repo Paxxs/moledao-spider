@@ -8,6 +8,7 @@ import type {
   RunSummary,
   ScrapeStatus,
 } from '@/types/ipc'
+import { trackStartScraping } from '@/lib/analytics'
 
 const MAX_LOG_LINES = 200
 const SIMULATION_JOB_DELAY_MS = 2200
@@ -125,6 +126,7 @@ export const useScraperBridge = () => {
   }, [cancelTimers])
 
   const startScrape = useCallback(async () => {
+    trackStartScraping()
     const api = getApi()
     if (!api) {
       runSimulation()
