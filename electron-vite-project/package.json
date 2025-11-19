@@ -1,11 +1,11 @@
 {
   "name": "electron-vite-project",
-  "productName": "MorFans的Ai 抓手",
-  "appAuthor": "MorFans",
+  "productName": "Paxos的Ai 抓手",
+  "appAuthor": "SuperPaxos",
   "appContact": "https://i.nb.gl",
   "description": "Modern Electron desktop client for orchestrating Moledao job scraping and Word exports.",
   "author": {
-    "name": "MorFans",
+    "name": "SuperPaxos",
     "url": "https://i.nb.gl"
   },
   "homepage": "https://i.nb.gl",

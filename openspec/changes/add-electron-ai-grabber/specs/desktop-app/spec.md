@@ -49,7 +49,7 @@ The About view MUST surface localized copy, author, and contact details sourced 
 
 #### Scenario: Author info comes from metadata
 - **GIVEN** the user opens About
-- **THEN** the view shows a paragraph describing the scraper, a highlighted author block that renders the name from `package.json` author metadata (MorFans), and a clickable contact link built from the metadata URL (https://i.nb.gl)
+- **THEN** the view shows a paragraph describing the scraper, a highlighted author block that renders the name from `package.json` author metadata (SuperPaxos), and a clickable contact link built from the metadata URL (https://i.nb.gl)
 - **AND** all text participates in localization and respects light/dark themes
 
 ### Requirement: Localization and Language Override
