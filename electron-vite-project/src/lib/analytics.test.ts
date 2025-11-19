@@ -8,6 +8,7 @@ import {
   trackOpenAbout,
   trackStartScraping,
 } from '@/lib/analytics'
+import { appMeta } from '@/lib/meta'
 
 const mockedInit = vi.mocked(init)
 const mockedTrack = vi.mocked(track)
@@ -27,7 +28,9 @@ describe('analytics helpers', () => {
       endpoint: 'https://ap.apppro.dev/api/event',
       captureOnLocalhost: true,
     })
-    expect(mockedTrack).toHaveBeenCalledWith('app-launch', {})
+    expect(mockedTrack).toHaveBeenCalledWith('app-launch', {
+      props: { version: `${appMeta.version}+${appMeta.commit}`, commit: appMeta.commit },
+    })
 
     trackAppLaunch()
     expect(mockedInit).toHaveBeenCalledTimes(1)
@@ -36,17 +39,23 @@ describe('analytics helpers', () => {
 
   it('tracks scraping start events', () => {
     trackStartScraping()
-    expect(mockedTrack).toHaveBeenCalledWith('start-scraping', {})
+    expect(mockedTrack).toHaveBeenCalledWith('start-scraping', {
+      props: { version: `${appMeta.version}+${appMeta.commit}`, commit: appMeta.commit },
+    })
   })
 
   it('tracks about view entries with metadata', () => {
     trackOpenAbout()
-    expect(mockedTrack).toHaveBeenCalledWith('open-about', { props: { screen: 'about' } })
+    expect(mockedTrack).toHaveBeenCalledWith('open-about', {
+      props: { version: `${appMeta.version}+${appMeta.commit}`, commit: appMeta.commit, screen: 'about' },
+    })
   })
 
   it('tracks about link clicks with the target host', () => {
     trackAboutLinkClick('i.nb.gl')
-    expect(mockedTrack).toHaveBeenCalledWith('about-link-click', { props: { target: 'i.nb.gl' } })
+    expect(mockedTrack).toHaveBeenCalledWith('about-link-click', {
+      props: { version: `${appMeta.version}+${appMeta.commit}`, commit: appMeta.commit, target: 'i.nb.gl' },
+    })
   })
 
   it('skips analytics when window is unavailable', () => {

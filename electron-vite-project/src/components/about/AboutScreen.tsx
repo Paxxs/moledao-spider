@@ -27,6 +27,11 @@ export const AboutScreen = ({ onOpenExternal }: Props) => {
           <Badge variant="secondary" className="text-xs uppercase tracking-[0.3em]">
             v{appMeta.version}
           </Badge>
+          {appMeta.commit && (
+            <Badge variant="outline" className="text-xs">
+              {t('commitLabel') ?? 'Commit'}: {appMeta.commit}
+            </Badge>
+          )}
           <Badge variant="outline" className="bg-amber-700 text-emerald-200">
             Ai Word Export
           </Badge>

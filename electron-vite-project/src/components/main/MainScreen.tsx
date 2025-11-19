@@ -104,7 +104,8 @@ export const MainScreen = ({
               <p className="mt-2 text-xl font-semibold text-white/90">
                 {progress ? (
                   <span>
-                    {progress.processed}/{progress.total}
+                    {progress.processed}
+                    {/* /{progress.total} */}
                     <span className="pl-1 text-sm font-normal text-muted-foreground">{t('jobsLabel')}</span>
                   </span>
                 ) : (

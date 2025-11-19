@@ -1,8 +1,19 @@
 /// <reference types="vitest" />
 import { defineConfig } from 'vite'
 import path from 'node:path'
+import { execSync } from 'node:child_process'
 import electron from 'vite-plugin-electron/simple'
 import react from '@vitejs/plugin-react-swc'
+
+const resolveCommitHash = () => {
+  try {
+    return execSync('git rev-parse --short HEAD').toString().trim()
+  } catch {
+    return 'unknown'
+  }
+}
+
+process.env.VITE_APP_COMMIT = process.env.VITE_APP_COMMIT || resolveCommitHash()
 
 // https://vitejs.dev/config/
 export default defineConfig({
