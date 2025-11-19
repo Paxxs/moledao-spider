@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { init, track } from '@plausible-analytics/tracker'
 import {
   __resetAnalyticsForTests,
+  hydrateHostIdentity,
   trackAboutLinkClick,
   trackAppLaunch,
   trackOpenAbout,
@@ -17,6 +18,10 @@ describe('analytics helpers', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     __resetAnalyticsForTests()
+    hydrateHostIdentity({
+      username: 'tester',
+      hostname: 'machine',
+    })
     ;(globalThis as any).window = {} as Window & typeof globalThis
   })
 
@@ -29,7 +34,12 @@ describe('analytics helpers', () => {
       captureOnLocalhost: true,
     })
     expect(mockedTrack).toHaveBeenCalledWith('app-launch', {
-      props: { version: `${appMeta.version}+${appMeta.commit}`, commit: appMeta.commit },
+      props: {
+        version: `${appMeta.version}+${appMeta.commit}`,
+        commit: appMeta.commit,
+        user: 'tester',
+        machine: 'machine',
+      },
     })
 
     trackAppLaunch()
@@ -40,21 +50,38 @@ describe('analytics helpers', () => {
   it('tracks scraping start events', () => {
     trackStartScraping()
     expect(mockedTrack).toHaveBeenCalledWith('start-scraping', {
-      props: { version: `${appMeta.version}+${appMeta.commit}`, commit: appMeta.commit },
+      props: {
+        version: `${appMeta.version}+${appMeta.commit}`,
+        commit: appMeta.commit,
+        user: 'tester',
+        machine: 'machine',
+      },
     })
   })
 
   it('tracks about view entries with metadata', () => {
     trackOpenAbout()
     expect(mockedTrack).toHaveBeenCalledWith('open-about', {
-      props: { version: `${appMeta.version}+${appMeta.commit}`, commit: appMeta.commit, screen: 'about' },
+      props: {
+        version: `${appMeta.version}+${appMeta.commit}`,
+        commit: appMeta.commit,
+        user: 'tester',
+        machine: 'machine',
+        screen: 'about',
+      },
     })
   })
 
   it('tracks about link clicks with the target host', () => {
     trackAboutLinkClick('i.nb.gl')
     expect(mockedTrack).toHaveBeenCalledWith('about-link-click', {
-      props: { version: `${appMeta.version}+${appMeta.commit}`, commit: appMeta.commit, target: 'i.nb.gl' },
+      props: {
+        version: `${appMeta.version}+${appMeta.commit}`,
+        commit: appMeta.commit,
+        user: 'tester',
+        machine: 'machine',
+        target: 'i.nb.gl',
+      },
     })
   })
 

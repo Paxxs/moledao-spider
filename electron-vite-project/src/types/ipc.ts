@@ -40,6 +40,11 @@ export interface AppMetadata {
   version: string
 }
 
+export interface HostInfo {
+  username: string | null
+  hostname: string | null
+}
+
 export interface ElectronAPI {
   startScrape: () => Promise<void>
   cancelScrape: () => Promise<void>
@@ -47,6 +52,7 @@ export interface ElectronAPI {
   getSettings: () => Promise<AppSettings>
   saveSettings: (settings: AppSettings) => Promise<AppSettings>
   getAppMeta: () => Promise<AppMetadata>
+  getHostInfo: () => Promise<HostInfo>
   openExternalLink: (url: string) => Promise<void>
   openSummaryFolderAndExit: () => Promise<void>
   onLog: (callback: (entry: LogEntry) => void) => () => void

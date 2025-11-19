@@ -9,7 +9,7 @@ import { TooltipProvider } from '@/components/ui/tooltip'
 import { useAppLocale } from '@/hooks/useAppLocale'
 import { useScraperBridge } from '@/hooks/useScraperBridge'
 import { useSystemTheme } from '@/hooks/useSystemTheme'
-import { trackAppLaunch, trackOpenAbout, trackAboutLinkClick } from '@/lib/analytics'
+import { hydrateHostIdentity, trackAppLaunch, trackOpenAbout, trackAboutLinkClick } from '@/lib/analytics'
 import { appMeta } from '@/lib/meta'
 import '@/lib/i18n'
 import { useSettingsStore } from '@/store/settings'
@@ -32,6 +32,19 @@ function App() {
   useEffect(() => {
     hydrate()
   }, [hydrate])
+
+  useEffect(() => {
+    const api = window.electronAPI
+    if (!api?.getHostInfo) {
+      return
+    }
+    api
+      .getHostInfo()
+      .then((info) => hydrateHostIdentity(info))
+      .catch(() => {
+        hydrateHostIdentity(null)
+      })
+  }, [])
 
   useEffect(() => {
     if (launchTrackedRef.current) return

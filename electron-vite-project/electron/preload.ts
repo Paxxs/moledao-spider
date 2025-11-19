@@ -2,6 +2,7 @@ import { contextBridge, ipcRenderer, type IpcRendererEvent } from 'electron'
 
 import type {
   AppMetadata,
+  HostInfo,
   JobTickerItem,
   LogEntry,
   ProgressPayload,
@@ -23,6 +24,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   getSettings: () => ipcRenderer.invoke('settings:get') as Promise<AppSettings>,
   saveSettings: (settings: AppSettings) => ipcRenderer.invoke('settings:save', settings) as Promise<AppSettings>,
   getAppMeta: () => ipcRenderer.invoke('app:meta') as Promise<AppMetadata>,
+  getHostInfo: () => ipcRenderer.invoke('app:host-info') as Promise<HostInfo>,
   openExternalLink: (url: string) => ipcRenderer.invoke('app:open-external', url),
   openSummaryFolderAndExit: () => ipcRenderer.invoke('app:open-summary-and-exit'),
   onLog: subscribe<LogEntry>('scrape:log'),
