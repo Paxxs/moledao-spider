@@ -1,3 +1,4 @@
+/// <reference types="vitest" />
 import { defineConfig } from 'vite'
 import path from 'node:path'
 import electron from 'vite-plugin-electron/simple'
@@ -31,4 +32,11 @@ export default defineConfig({
         : {},
     }),
   ],
+  test: {
+    environment: 'node',
+    clearMocks: true,
+    alias: {
+      '@plausible-analytics/tracker': path.resolve(__dirname, 'src/test/mocks/plausible-tracker.ts'),
+    },
+  },
 })

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { AboutScreen } from '@/components/about/AboutScreen'
@@ -9,6 +9,7 @@ import { TooltipProvider } from '@/components/ui/tooltip'
 import { useAppLocale } from '@/hooks/useAppLocale'
 import { useScraperBridge } from '@/hooks/useScraperBridge'
 import { useSystemTheme } from '@/hooks/useSystemTheme'
+import { trackAppLaunch, trackOpenAbout, trackAboutLinkClick } from '@/lib/analytics'
 import { appMeta } from '@/lib/meta'
 import '@/lib/i18n'
 import { useSettingsStore } from '@/store/settings'
@@ -16,6 +17,8 @@ import { useSettingsStore } from '@/store/settings'
 function App() {
   const { t } = useTranslation()
   const [view, setView] = useState<'main' | 'settings' | 'about'>('main')
+  const launchTrackedRef = useRef(false)
+  const lastTrackedView = useRef<'main' | 'settings' | 'about' | null>(null)
 
   const hydrate = useSettingsStore((state) => state.hydrate)
   const loaded = useSettingsStore((state) => state.loaded)
@@ -29,6 +32,33 @@ function App() {
   useEffect(() => {
     hydrate()
   }, [hydrate])
+
+  useEffect(() => {
+    if (launchTrackedRef.current) return
+    trackAppLaunch()
+    launchTrackedRef.current = true
+  }, [])
+
+  useEffect(() => {
+    if (view === 'about' && lastTrackedView.current !== 'about') {
+      trackOpenAbout()
+    }
+    lastTrackedView.current = view
+  }, [view])
+
+  const handleOpenExternal = useCallback(async (url: string) => {
+    try {
+      const targetHost = new URL(url).hostname
+      if (targetHost === 'i.nb.gl') {
+        trackAboutLinkClick(targetHost)
+      }
+    } catch {
+      if (url.includes('i.nb.gl')) {
+        trackAboutLinkClick('i.nb.gl')
+      }
+    }
+    await openExternal(url)
+  }, [openExternal])
 
   return (
     <TooltipProvider>
@@ -67,7 +97,7 @@ function App() {
                     <SettingsScreen />
                   </TabsContent>
                   <TabsContent value="about" className="h-full overflow-auto p-11">
-                    <AboutScreen onOpenExternal={openExternal} />
+                    <AboutScreen onOpenExternal={handleOpenExternal} />
                   </TabsContent>
                 </div>
               </Tabs>
